@@ -21,18 +21,13 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
-    public Order createOrder(Long userId, Order order) {
+    public Order createOrder(Long userId, String productName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found with id " + userId));
 
-        Order newOrder = new Order(
-                order.getProductName(),
-                "CREATED",
-                user
-        );
-
-        return orderRepository.save(newOrder);
+        Order order = new Order(productName, "CREATED", user);
+        return orderRepository.save(order);
     }
 
     public List<Order> getOrdersByUser(Long userId) {

@@ -41,5 +41,8 @@ public class Order {
     public String getStatus() {
         return status;
     }
+    public User getUser() {
+        return user;
+    }
 }
 

@@ -1,12 +1,12 @@
 package com.example.ordermanagement.controller;
 
-import com.example.ordermanagement.entity.User;
+import com.example.ordermanagement.dto.UserRequestDTO;
+import com.example.ordermanagement.dto.UserResponseDTO;
+import com.example.ordermanagement.mapper.UserMapper;
 import com.example.ordermanagement.service.UserService;
-import com.example.ordermanagement.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -18,26 +18,26 @@ public class UserController {
         this.userService = userService;
     }
 
+    // CREATE USER
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-        return userService.createUser(user);
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO dto) {
+        return UserMapper.toDTO(
+                userService.createUser(UserMapper.toEntity(dto))
+        );
     }
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
+    // GET USER BY ID
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found with id " + id);
-        }
-        return user;
+    public UserResponseDTO getUser(@PathVariable Long id) {
+        return UserMapper.toDTO(
+                userService.getUserById(id)
+        );
     }
 
+    // DELETE USER
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
