@@ -1,7 +1,9 @@
 package com.example.ordermanagement.controller;
 
 import com.example.ordermanagement.entity.User;
-import com.example.ordermanagement.repository.UserRepository;
+import com.example.ordermanagement.service.UserService;
+import com.example.ordermanagement.exception.ResourceNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,29 +12,33 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
+    public User createUser(@Valid @RequestBody User user) {
+        return userService.createUser(user);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
-        return userRepository.findById(id).orElse(null);
+        User user = userService.getUserById(id);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found with id " + id);
+        }
+        return user;
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
-        userRepository.deleteById(id);
+        userService.deleteUser(id);
     }
 }

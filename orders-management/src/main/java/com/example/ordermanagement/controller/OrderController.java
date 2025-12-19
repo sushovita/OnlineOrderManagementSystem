@@ -1,9 +1,8 @@
 package com.example.ordermanagement.controller;
 
 import com.example.ordermanagement.entity.Order;
-import com.example.ordermanagement.entity.User;
-import com.example.ordermanagement.repository.OrderRepository;
-import com.example.ordermanagement.repository.UserRepository;
+import com.example.ordermanagement.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,23 +11,20 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final OrderService orderService;
 
-    public OrderController(OrderRepository orderRepository, UserRepository userRepository) {
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @PostMapping("/{userId}")
-    public Order createOrder(@PathVariable Long userId, @RequestBody Order order) {
-        User user = userRepository.findById(userId).orElse(null);
-        order = new Order(order.getProductName(), "CREATED", user);
-        return orderRepository.save(order);
+    public Order createOrder(@PathVariable Long userId,
+                            @Valid @RequestBody Order order) {
+        return orderService.createOrder(userId, order);
     }
 
     @GetMapping("/user/{userId}")
     public List<Order> getUserOrders(@PathVariable Long userId) {
-        return orderRepository.findByUserId(userId);
+        return orderService.getOrdersByUser(userId);
     }
 }
